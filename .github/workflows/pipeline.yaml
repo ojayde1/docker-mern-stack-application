@@ -110,7 +110,7 @@ jobs:
               # IMPORTANT: Use the SSH URL if your repo is private and you have SSH keys set up on EC2
               # git clone git@github.com:YOUR_USERNAME/docker-mern-stack-application.git
               # Or, use HTTPS for public repos:
-              git clone https://github.com/YOUR_USERNAME/docker-mern-stack-application.git
+              git clone https://github.com/ojayde1/docker-mern-stack-application.git
             else
               # If folder exists, navigate into it and pull latest changes
               echo "Repository already exists, pulling latest changes..."
@@ -120,7 +120,7 @@ jobs:
             fi
 
             # Navigate into the project directory for Docker commands
-            cd docker-mern-stack-application.git
+            cd docker-mern-stack-application
             
             # Pull the latest Docker images from Docker Hub
             docker compose pull
