@@ -102,7 +102,7 @@ jobs:
           script: |
             # IMPORTANT: Replace '/path/to/your/app' with the actual directory on your EC2 instance
             # (e.g., /home/ubuntu/docker-mern-stack-application)
-            cd /path/to/your/app 
+            cd /home/ubuntu/docker-mern-stack-application 
             
             # Pull the latest Docker images from Docker Hub
             docker compose pull
