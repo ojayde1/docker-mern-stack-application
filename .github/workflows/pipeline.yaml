@@ -23,22 +23,22 @@ jobs:
           
       - name: Install dependencies for backend
         run: |
-          cd backend
+          cd mern/backend
           npm ci
           
       - name: Run backend tests
         run: |
-          cd backend
+          cd mern/backend
           npm test
           
       - name: Install dependencies for frontend
         run: |
-          cd frontend
+          cd mern/frontend
           npm ci
           
       - name: Run frontend tests
         run: |
-          cd frontend
+          cd mern/frontend
           npm test
           
   build_and_deploy:
@@ -62,7 +62,7 @@ jobs:
       - name: Build and push backend Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./backend
+          context: .mern/backend/package-lock.json
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:buildcache
@@ -71,7 +71,7 @@ jobs:
       - name: Build and push frontend Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./frontend
+          context: .mern/frontend/package-lock.json
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mern-frontend:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-frontend:buildcache
