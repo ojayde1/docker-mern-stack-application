@@ -1,11 +1,14 @@
+# 
+
+
 name: MERN Stack CI/CD Pipeline
 
 on:
   push:
-    branches: [ compose ]
+    branches: [ compose ] # Triggers on pushes to the 'compose' branch
   #pull_request:
-  #  branches: [ main, master ]
-  workflow_dispatch:
+  # branches: [ main, master ] # Uncomment and adjust if you want PRs to trigger
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
   test:
@@ -13,88 +16,103 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v4 # Use v4 for latest compatibility
+
+      # --- Backend Test Steps ---
+      - name: Setup Node.js for Backend
+        uses: actions/setup-node@v4 # Use v4 for latest compatibility
         with:
-          node-version: '18'
+          node-version: '18' # Or your desired Node.js version
           cache: 'npm'
+          # IMPORTANT: cache-dependency-path must point to the lock file relative to the repo root
+          cache-dependency-path: mern/backend/package-lock.json 
           
       - name: Install dependencies for backend
-        run: |
-          cd mern/backend
-          npm ci
+        # Using 'working-directory' is cleaner than 'cd' inside 'run'
+        run: npm ci 
+        working-directory: ./mern/backend # Executes npm ci inside mern/backend
           
       - name: Run backend tests
-        run: |
-          cd mern/backend
-          npm test
+        run: npm test
+        working-directory: ./mern/backend # Executes npm test inside mern/backend
+
+      # --- Frontend Test Steps ---
+      # Need a separate setup-node for frontend to ensure correct caching path
+      - name: Setup Node.js for Frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or your desired Node.js version
+          cache: 'npm'
+          # IMPORTANT: cache-dependency-path must point to the lock file relative to the repo root
+          cache-dependency-path: mern/frontend/package-lock.json 
           
       - name: Install dependencies for frontend
-        run: |
-          cd mern/frontend
-          npm ci
+        run: npm ci
+        working-directory: ./mern/frontend # Executes npm ci inside mern/frontend
           
       - name: Run frontend tests
-        run: |
-          cd mern/frontend
-          npm test
+        run: npm test
+        working-directory: ./mern/frontend # Executes npm test inside mern/frontend
           
   build_and_deploy:
-    needs: test
+    needs: test # This job will only run if the 'test' job succeeds
     runs-on: ubuntu-latest
+    # This condition ensures deployment only happens on push or manual trigger, not PRs
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Use v4 for latest compatibility
         
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3 # Use v3 for latest compatibility
         
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3 # Use v3 for latest compatibility
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: Build and push backend Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5 # Use v5 for latest compatibility
         with:
-          context: .mern/backend
+          # CORRECTED: context must be the DIRECTORY containing the Dockerfile, not a file
+          context: ./mern/backend/ 
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:buildcache,mode=max
           
       - name: Build and push frontend Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5 # Use v5 for latest compatibility
         with:
-          context: .mern/frontend
+          # CORRECTED: context must be the DIRECTORY containing the Dockerfile, not a file
+          context: ./mern/frontend/ 
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mern-frontend:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-frontend:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-frontend:buildcache,mode=max
           
       - name: Deploy to server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.0 # IMPORTANT: Use a specific version like v1.0.0, not 'master'
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /path/to/your/app
+            # IMPORTANT: Replace '/path/to/your/app' with the actual directory on your EC2 instance
+            # (e.g., /home/ubuntu/docker-mern-stack-application)
+            cd /path/to/your/app 
             
-            # Pull the latest code
-            git pull
-            
-            # Pull the latest images
-            docker-compose pull
+            # Pull the latest Docker images from Docker Hub
+            docker compose pull
             
             # Restart containers with new images
-            docker-compose down
-            docker-compose up -d
+            # 'docker-compose' is deprecated, use 'docker compose'
+            docker compose down 
+            docker compose up -d --force-recreate # --build is not needed here as images are pulled
             
-            # Cleanup unused images
+            # Cleanup unused images (optional but good for space)
             docker image prune -f
+            
+            echo "Deployment successful!"
