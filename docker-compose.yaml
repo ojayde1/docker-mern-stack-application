@@ -1,6 +1,8 @@
 services:
   backend:
-    build: ./mern/backend
+     # REMOVED: build: ./mern/backend
+    # ADDED: Reference the image from Docker Hub
+    image: ojayde35/mern-backend:latest # <--- IMPORTANT: Replace YOUR_DOCKERHUB_USERNAME
     ports:
       - "5050:5050" 
     networks:
@@ -11,7 +13,9 @@ services:
       - mongodb
 
   frontend:
-    build: ./mern/frontend
+    # REMOVED: build: ./mern/frontend
+    # ADDED: Reference the image from Docker Hub
+    image: ojayde35/mern-frontend:latest # <--- IMPORTANT: Replace YOUR_DOCKERHUB_USERNAME
     ports:
       - "5173:5173"  
     networks:
