@@ -97,7 +97,7 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mern-backend:buildcache,mode=max
           
       - name: Build and push frontend Docker image
-        uses: docker/build-push-action@v5 # Use v5 for latest compatibility
+        uses: docker/build-push-action@v5  # Use v5 for latest compatibility
         with:
           # CORRECTED: context must be the DIRECTORY containing the Dockerfile, not a file
           context: ./mern/frontend/ 
