@@ -2,7 +2,7 @@ name: MERN Stack CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ compose ]
   #pull_request:
   #  branches: [ main, master ]
   workflow_dispatch:
