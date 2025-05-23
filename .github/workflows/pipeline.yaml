@@ -74,7 +74,7 @@ jobs:
           source: "." # This means copy everything from the root of your Git repository
           # IMPORTANT: This is the directory on your EC2 instance where your project files will go.
           # Make sure it exists, or create it manually via SSH first!
-          target: "/home/ubuntu/docker-mern-stack-application" # <--- CHOOSE A SPECIFIC, NEW PATH HERE! (e.g., /home/ubuntu/mern-app)
+          target: "/home/ubuntu/docker-mern-stack-application/" # <--- CHOOSE A SPECIFIC, NEW PATH HERE! (e.g., /home/ubuntu/mern-app)
                                               # This path MUST match the 'cd' command in the next step.
       # --- END OF NEW STEP ---
       - name: Set up Docker Buildx
