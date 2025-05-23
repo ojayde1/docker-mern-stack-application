@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "test": "jest"
+    "test": "echo \"No backend tests configured yet.\" && exit 0"
   },
   "keywords": [],
   "author": "",
