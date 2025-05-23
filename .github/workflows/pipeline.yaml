@@ -102,7 +102,25 @@ jobs:
           script: |
             # IMPORTANT: Replace '/path/to/your/app' with the actual directory on your EC2 instance
             # (e.g., /home/ubuntu/docker-mern-stack-application)
-            cd /home/ubuntu/docker-mern-stack-application 
+            cd /home/ubuntu
+
+            # Clone repository if it doesn't exist
+            if [ ! -d "docker-mern-stack-application" ]; then
+              echo "Cloning repository..."
+              # IMPORTANT: Use the SSH URL if your repo is private and you have SSH keys set up on EC2
+              # git clone git@github.com:YOUR_USERNAME/docker-mern-stack-application.git
+              # Or, use HTTPS for public repos:
+              git clone https://github.com/YOUR_USERNAME/docker-mern-stack-application.git
+            else
+              # If folder exists, navigate into it and pull latest changes
+              echo "Repository already exists, pulling latest changes..."
+              cd docker-mern-stack-application
+              git pull origin compose # Pull from your deployment branch
+              cd .. # Go back to /home/ubuntu to run docker compose
+            fi
+
+            # Navigate into the project directory for Docker commands
+            cd docker-mern-stack-application.git
             
             # Pull the latest Docker images from Docker Hub
             docker compose pull
