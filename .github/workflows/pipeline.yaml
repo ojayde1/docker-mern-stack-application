@@ -16,7 +16,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Use v4 for latest compatibility
+        uses: actions/checkout@v4 # Use v4 for latest compatibility.
 
       # --- Backend Test Steps ---
       - name: Setup Node.js for Backend
